@@ -1,0 +1,216 @@
+openapi: 3.0.3
+info:
+  title: TrendMart Merchant Analytics API
+  version: 1.0.0
+  description: Analytics API for merchant dashboard
+servers:
+  - url: http://localhost:3000/api
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "healthy"
+  /analytics/overview:
+    get:
+      summary: Get key performance metrics
+      parameters:
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [7d, 30d, 90d]
+            default: 30d
+      responses:
+        '200':
+          description: Overview metrics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total_revenue:
+                    type: number
+                    format: float
+                    example: 125000.50
+                  total_orders:
+                    type: integer
+                    example: 342
+                  average_order_value:
+                    type: number
+                    format: float
+                    example: 365.50
+                  period:
+                    type: string
+                    example: "30d"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /analytics/sales-trends:
+    get:
+      summary: Get sales trends over time
+      parameters:
+        - name: period
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [7d, 30d, 90d]
+      responses:
+        '200':
+          description: Sales trends data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        date:
+                          type: string
+                          format: date
+                          example: "2025-05-08"
+                        revenue:
+                          type: number
+                          format: float
+                          example: 2500.00
+                        orders:
+                          type: integer
+                          example: 8
+                  period:
+                    type: string
+                    example: "30d"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /analytics/top-products:
+    get:
+      summary: Get top performing products
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 10
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [7d, 30d, 90d]
+            default: 30d
+      responses:
+        '200':
+          description: Top products by revenue
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  products:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        name:
+                          type: string
+                          example: "Wireless Headphones"
+                        total_revenue:
+                          type: number
+                          format: float
+                          example: 15000.00
+                        units_sold:
+                          type: integer
+                          example: 125
+                        growth_rate:
+                          type: number
+                          format: float
+                          example: 15.5
+                        category:
+                          type: string
+                          example: "Electronics"
+                  period:
+                    type: string
+                    example: "30d"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+  /orders/simulate:
+    post:
+      summary: Simulate new order for testing real-time features
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                product_id:
+                  type: integer
+                  example: 1
+                quantity:
+                  type: integer
+                  example: 2
+                total_amount:
+                  type: number
+                  format: float
+                  example: 299.99
+      responses:
+        '201':
+          description: Order simulated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 203
+                  status:
+                    type: string
+                    example: "completed"
+                  order_date:
+                    type: string
+                    format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+components:
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "Invalid period parameter"
+    InternalError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "Database connection failed"

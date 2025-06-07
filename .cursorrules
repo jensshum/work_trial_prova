@@ -1,0 +1,11 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+- ensure the swagger openapi.yaml is in the root
+- create next.js route handler
+- move the actual business logic to lib/db
+- only use prisma with sqlite
+- install all dependencies using npm
+- create a simple sqlite.db
