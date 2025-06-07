@@ -78,7 +78,7 @@ export interface SimulateOrderResponse {
   order_date: string;
 }
 
-const API_BASE = '/api';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://trendmartai.netlify.app/api';
 
 export const api = {
   async getOverview(period: '7d' | '30d' | '90d' = '30d'): Promise<OverviewMetrics> {
